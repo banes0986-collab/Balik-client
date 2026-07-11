@@ -14,15 +14,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Make Gradle Executable
-        run: chmod +x gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew build
-
-      - name: Upload Mod Jar
-        uses: actions/upload-artifact@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          name: BalikClient-Jar
-          path: build/libs/*.jar
-          
+          gradle-version: '7.4.2' # Fabric 1.18.2 için en kararlı Gradle sürümü
+
+      - name: Build with System Gradle
+        run: gradle build --no-daemon
+        
