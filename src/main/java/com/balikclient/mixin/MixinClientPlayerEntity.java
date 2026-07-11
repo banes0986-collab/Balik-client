@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPlayerEntity.class)
 public class MixinClientPlayerEntity {
 
-    @Inject(method = "attackTargetEntityWithCurrentItem", at = @At("HEAD"))
+    @Inject(method = "attack", at = @At("HEAD"))
     private void onAttack(Entity target, CallbackInfo ci) {
         ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
         if (target != null) {
@@ -20,4 +20,4 @@ public class MixinClientPlayerEntity {
             player.sendMessage(new LiteralText("§b[Balık] §fHedefe §e" + formattedDistance + " §fbloktan vurdun!"), true);
         }
     }
-}
+                          }
