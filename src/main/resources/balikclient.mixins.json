@@ -3,7 +3,8 @@
   "package": "com.balikclient.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MixinInGameHud"
+    "MixinInGameHud",
+    "MixinClientPlayerEntity"
   ],
   "injectors": {
     "defaultRequire": 1
