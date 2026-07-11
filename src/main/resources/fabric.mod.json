@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "balikclient",
+  "version": "1.0.0",
+  "name": "Balik Client",
+  "description": "Minecraft 1.18.2 Gelişmiş Utility ve HUD Client Modu",
+  "authors": [
+    "banes0986"
+  ],
+  "contact": {
+    "homepage": "https://github.com/banes0986/Balik-client"
+  },
+  "license": "MIT",
+  "icon": "assets/balikclient/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "com.balikclient.BalikClient"
+    ]
+  },
+  "mixins": [
+    "balikclient.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.6",
+    "minecraft": "~1.18.2",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
+}
