@@ -5,6 +5,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,25 +16,22 @@ import java.util.List;
 
 @Mixin(InGameHud.class)
 public class MixinInGameHud {
-    // CPS hesaplamak için tıklama zamanlarını tutacak liste
     private static final List<Long> leftClicks = new ArrayList<>();
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
         MinecraftClient client = MinecraftClient.getInstance();
-        
-        // Eğer F3 açık veya HUD gizliyse çizdirme yapma
         if (client.options.hudHidden || client.options.debugEnabled) return;
         if (client.player == null) return;
 
         TextRenderer textRenderer = client.textRenderer;
-        int yOffset = 5; // Ekranın en üstünden başla
+        int yOffset = 5;
 
         // 1. FPS GÖSTERGESİ
         if (BalikClientMenuScreen.showFps) {
             String fpsText = "🐟 FPS: §a" + client.getCurrentFps();
             textRenderer.drawWithShadow(matrices, fpsText, 5, yOffset, 0xFFFFFF);
-            yOffset += 12; // Bir alt satıra geç
+            yOffset += 12;
         }
 
         // 2. MS (PING) GÖSTERGESİ
@@ -48,14 +47,10 @@ public class MixinInGameHud {
 
         // 3. CPS GÖSTERGESİ
         long currentTime = System.currentTimeMillis();
-        // 1 saniyeden (1000ms) eski tıklamaları listeden temizle
         leftClicks.removeIf(time -> currentTime - time > 1000);
-        
-        // Oyun içi sol tık algılama (CPS için)
         if (client.options.attackKey.wasPressed()) {
             leftClicks.add(currentTime);
         }
-
         String cpsText = "⚔️ CPS: §c" + leftClicks.size();
         textRenderer.drawWithShadow(matrices, cpsText, 5, yOffset, 0xFFFFFF);
         yOffset += 12;
@@ -64,5 +59,32 @@ public class MixinInGameHud {
         String ip = client.isInSingleplayer() ? "Tek Oyunculu" : (client.getCurrentServerEntry() != null ? client.getCurrentServerEntry().address : "Bilinmiyor");
         String ipText = "🌐 IP: §b" + ip;
         textRenderer.drawWithShadow(matrices, ipText, 5, yOffset, 0xFFFFFF);
+
+        // 5. INVENTORY / ARMOR HUD (Sağ Alt Köşe)
+        int screenWidth = client.getWindow().getScaledWidth();
+        int screenHeight = client.getWindow().getScaledHeight();
+        int armorX = screenWidth - 25;
+        int armorY = screenHeight - 50;
+
+        // Zırhları ve Elindeki Eşyayı Listele (Kask, Göğüslük, Pantolon, Bot ve Ana El)
+        Iterable<ItemStack> armorItems = client.player.getArmorItems();
+        int itemIndex = 0;
+        for (ItemStack stack : armorItems) {
+            if (!stack.isEmpty()) {
+                client.getItemRenderer().renderInGui(stack, armorX, armorY - (itemIndex * 18));
+                client.getItemRenderer().renderGuiItemOverlay(textRenderer, stack, armorX, armorY - (itemIndex * 18));
+                itemIndex++;
+            }
+        }
+
+        // 6. AKTİF EFEKTLERİ GÖSTERME (Sağ Üst Köşe)
+        int effectY = 5;
+        for (StatusEffectInstance effect : client.player.getStatusEffects()) {
+            String effectName = effect.getEffectType().getName().getString();
+            int duration = effect.getDuration() / 20; // Saniyeye çevir
+            String effectText = "✨ " + effectName + " (" + duration + "s)";
+            textRenderer.drawWithShadow(matrices, effectText, screenWidth - textRenderer.getWidth(effectText) - 5, effectY, 0xFFFFFF);
+            effectY += 12;
+        }
     }
 }
