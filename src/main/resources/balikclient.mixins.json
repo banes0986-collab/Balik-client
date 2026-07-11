@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.balikclient.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "MixinInGameHud"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
