@@ -21,4 +21,9 @@ jobs:
 
       - name: Build with System Gradle
         run: gradle build --no-daemon
-        
+
+      - name: Upload built jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: balikclient-jar
+          path: build/libs/*.jar
