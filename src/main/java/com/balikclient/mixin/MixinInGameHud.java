@@ -27,9 +27,9 @@ public class MixinInGameHud {
         TextRenderer textRenderer = client.textRenderer;
         int yOffset = 5;
 
-        // 1. FPS GÖSTERGESİ
+        // 1. FPS GÖSTERGESİ (Hata veren kısım düzeltildi)
         if (BalikClientMenuScreen.showFps) {
-            String fpsText = "🐟 FPS: §a" + client.getCurrentFps();
+            String fpsText = "🐟 FPS: §a" + ((MinecraftClientAccessor) client).getCurrentFps();
             textRenderer.drawWithShadow(matrices, fpsText, 5, yOffset, 0xFFFFFF);
             yOffset += 12;
         }
@@ -60,16 +60,14 @@ public class MixinInGameHud {
         String ipText = "🌐 IP: §b" + ip;
         textRenderer.drawWithShadow(matrices, ipText, 5, yOffset, 0xFFFFFF);
 
-        // 5. INVENTORY / ARMOR HUD (Sağ Alt Köşe)
+        // 5. INVENTORY / ARMOR HUD
         int screenWidth = client.getWindow().getScaledWidth();
         int screenHeight = client.getWindow().getScaledHeight();
         int armorX = screenWidth - 25;
         int armorY = screenHeight - 50;
 
-        // Zırhları ve Elindeki Eşyayı Listele (Kask, Göğüslük, Pantolon, Bot ve Ana El)
-        Iterable<ItemStack> armorItems = client.player.getArmorItems();
         int itemIndex = 0;
-        for (ItemStack stack : armorItems) {
+        for (ItemStack stack : client.player.getArmorItems()) {
             if (!stack.isEmpty()) {
                 client.getItemRenderer().renderInGui(stack, armorX, armorY - (itemIndex * 18));
                 client.getItemRenderer().renderGuiItemOverlay(textRenderer, stack, armorX, armorY - (itemIndex * 18));
@@ -77,11 +75,11 @@ public class MixinInGameHud {
             }
         }
 
-        // 6. AKTİF EFEKTLERİ GÖSTERME (Sağ Üst Köşe)
+        // 6. AKTİF EFEKTLER
         int effectY = 5;
         for (StatusEffectInstance effect : client.player.getStatusEffects()) {
             String effectName = effect.getEffectType().getName().getString();
-            int duration = effect.getDuration() / 20; // Saniyeye çevir
+            int duration = effect.getDuration() / 20;
             String effectText = "✨ " + effectName + " (" + duration + "s)";
             textRenderer.drawWithShadow(matrices, effectText, screenWidth - textRenderer.getWidth(effectText) - 5, effectY, 0xFFFFFF);
             effectY += 12;
