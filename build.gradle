@@ -8,12 +8,15 @@ group = project.maven_group
 
 repositories {
     mavenCentral()
+    maven { url 'https://maven.fabricmc.net/' }
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    loader "net.fabricmc:fabric-loader:${project.loader_version}"
+    
+    // Hatalı olan satırları Fabric standartlarına göre güncelledik:
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
@@ -31,10 +34,4 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
     withSourcesJar()
-}
-
-jar {
-    from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}"}
-    }
 }
